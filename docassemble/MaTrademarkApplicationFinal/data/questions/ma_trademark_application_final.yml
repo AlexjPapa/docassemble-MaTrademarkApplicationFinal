@@ -1,0 +1,912 @@
+---
+include:
+  - docassemble.AssemblyLine:al_package.yml
+  - docassemble.ALMassachusetts:al_massachusetts.yml
+---
+metadata:
+  title: |
+    Massachusetts Trademark/Service Mark Application
+  short title: |
+    MA Trademark App
+  authors:
+    - Alex Papadopoulos
+---
+mandatory: True
+comment: |
+  Global interview metadata
+variable name: interview_metadata["ma_trademark_application_final"]
+data:
+  al_weaver_version: "1.6.1"
+  generated on: "2022-04-20"
+  title: >-
+    Massachusetts Trademark/Service Mark Application
+  short title: >-
+    MA Trademark App
+  description: |-
+    This is a form to file for protection of your mark.
+  original_form: >-
+    
+  allowed courts: []
+  categories: []
+  typical role: "na"
+---
+code: |
+  interview_metadata['main_interview_key'] =  'ma_trademark_application_final'
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  github_repo_name =  'docassemble-MaTrademarkApplicationFinal'
+---
+code: |
+  interview_short_title = "Fill out a Massachusetts trademark application"
+---
+code: |
+  al_form_type = 'other_form'
+---
+objects:
+  - applicant: ALPeopleList.using(ask_number=True,target_number=1)
+  - users: ALPeopleList.using(target_number=1, ask_number=True)
+  - business_address: ALAddress
+---
+sections:
+  - review_ma_trademark_application_final: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_ma_trademark_application_final
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["ma_trademark_application_final"]["allowed courts"]
+  nav.set_section('review_ma_trademark_application_final')
+  user_role = 'na'
+  Welcome
+  today_date
+  user_type
+  if user_type == 'Individual':
+    users[0].name.first
+    users[0].address.address
+    set_progress(14)
+  elif user_type == 'Business/Organization':
+    bus_name
+    business_address.address
+    bus_type
+    set_progress(28)
+    corp_date
+  Trade_mark
+  mark_makeup
+  goods_description
+  Classification_Schedule
+  set_progress(42)
+  OnDocumentsWrappersOrArticlesDeliveredWithTheGoods
+  mark_date
+  uspto
+  set_progress(57)
+  users.gather()
+  set_parts(subtitle=str(users))
+  users[0].phone_number
+  users[0].email
+  interview_order_ma_trademark_application_final = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  ma_trademark_application_final_intro
+  interview_order_ma_trademark_application_final
+  signature_date
+  # Save anonymized interview statistics (customize the saved data below)
+  store_variables_snapshot(data={'zip': users[0].address.zip})
+  ma_trademark_application_final_preview_question
+  basic_questions_signature_flow
+  users[0].signature
+  ma_trademark_application_final_download
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Massachusetts_TrademarkService_Mark_Application
+continue button field: ma_trademark_application_final_intro
+question: |
+  Massachusetts Trademark/Service Mark Application
+subquestion: |
+    Answer the following questions to get a filled out form that you can send in for trademark protection in the state of Massachusetts!
+---
+id: Welcome
+question: |
+  Check if your mark is already protected!!
+subquestion: |
+  **Your mark may already be protected.** Search through the Massachusetts trademark database before filling out this form to see if your mark already has protection by someone else.
+  
+  [Click here to search the Massachusetts database.](https://corp.sec.state.ma.us/corpweb/trademarksearch/trademarksearch.aspx)
+  
+  Tips: Look for marks that are similar to your trademark and used on related products or for related services. If your mark contains more than one word, try searching each word individually to maximize the results. 
+  
+  Keep the search simple and try a variety of terms surrounding your mark.
+  
+  For more assistance on how to accurately search for your mark [click here.](https://corp.sec.state.ma.us/corp/corpsearch/SearchOnlineHelp.asp)
+continue button field: Welcome
+---
+code: |
+  today_date = today()
+---
+id: Are you filing as an individual or a business
+question: |
+  Are you filing as an individual or a business?
+field: user_type
+buttons:
+  - Individual
+  - Business/Organization
+---
+id: Individual Name
+question: |
+  Individual - Name
+subquestion: |
+  Write your name.
+fields:
+  - "Your first name": user_first
+    maxlength: 21
+  - "Your middle name": user_middle
+    required: False
+    maxlength: 24
+  - "Your last name": user_last
+    maxlength: 27
+---
+id: Individual Address
+question: |
+  Individual - Address
+subquestion: |
+  Write your address number and street name.
+fields:
+  - "Your address number": user_address_num
+    datatype: number
+    maxlength: 10
+  - "Name of your street": user_address_st
+    maxlength: 25
+---
+id: Business Name
+question: |
+  Business - Name
+fields:
+  - "Name of your Business": bus_name
+    maxlength: 64
+---
+id: Business Address
+question: |
+  Business - Address
+subquestion: |
+  Write the address where the main building of your business is located. Write the number, street name, city/town, state, and zip code.
+fields:
+  - "Business Address Number": bus_address_number
+    datatype: number
+    maxlength: 13
+  - "Street Address of Business": bus_address_st
+    maxlength: 45
+  - "Business Address City": bus_address_city
+    maxlength: 32
+  - "Business Address State": bus_address_state
+    maxlength: 13
+  - "Business Address Zip code": bus_address_zip
+    maxlength: 13
+---
+id: What kind of business organization are you
+question: |
+  What kind of business/organization are you?
+fields:
+  - Select your business type: bus_type
+    datatype: radio
+    choices:
+    - "Corporation": Corporation
+    - "Limited Liability Company": LLC
+    - "Limited Partnership": LP
+    - "Partnership": Partnership
+    - "Sole proprietor": SoleProprietor
+    - "Corporation Type Not listed": corp_other
+  - Describe corporation type: corp_other_type
+    js show if: |
+      val('bus_type') == 'corp_other'
+    maxlength: 72
+  - Write the full name of each partner.: corp_partners
+    js show if: |
+	    val('bus_type') == 'Partnership'
+    input type: area
+    maxlength: 304
+  - Write the full name of each partner.: corp_partners
+    js show if: |
+	    val('bus_type') == 'LP'
+    input type: area
+    maxlength: 304
+---
+id: Incorporation
+question: |
+  Incorporation
+subquestion: |
+  If applicable, write the date when your business/organization was incorporated and the state that your business is incorporated (this may be different than the mailing address).
+fields:
+  - "Date of Incorporation": corp_date
+    datatype: date
+    required: False
+  - "State of Incorporation": corp_state
+    maxlength: 10
+    required: False
+continue button field: Incorporation
+---
+id: About Your Mark
+mandatory: True
+question: |
+  Are you filing for a trademark or a service mark?
+subquestion: |
+  A **trademark** is any word, name, symbol or device, or combination of these, used by a person (individual, partnership, corporation or association) to identify his goods and to distinguish them from the goods manufactured or sold by others.
+  
+  Examples of trademarks are: 
+  
+  * Kodak 
+  * Coca-Cola
+  * GE
+  * Life-Savers
+  * McDonalds
+  
+  A **service mark** identifies and distinguishes a person’s services.
+  
+  Examples of service marks are:
+  
+  * “Citibank” (Service mark for Citibank)
+  * “Greyhound” (service mark Greyhound Bus Lines)
+  * “Hilltop” (service mark for the Hilltop Restaurant)
+  
+  *Choose the category that is best for your mark.*
+fields:
+  - Type of mark: Trade_mark
+    input type: radio
+    choices:
+     - "Trademark": Trademark
+     - "Service Mark": ServiceMark
+---
+id: About Your Mark cont
+question: |
+  About Your Mark cont.
+subquestion: |
+  Select if your mark is only words, only a design, or consists of both words and design. Once you have selected the option that matches your mark, give a description of your mark in as much detail as possible.
+  
+  EXAMPLE: The mark "Sauce Burgers" which mark consists of both words and design is described like this: *The word "sauce" in oragne shadowed lettering and underneath the phrase "burgers" in black, faded coloring all caps font.*
+fields:
+  - My mark is: mark_makeup
+    datatype: radio
+    choices:
+      - "ONLY WORDS": mark_words_check
+      - "ONLY A DESIGN": mark_design_check
+      - "BOTH words and design": mark_words_design_check
+  - Write the words in your mark.: mark_words
+    input type: area
+    maxlength: 300
+    js show if: |
+      val('mark_makeup') == 'mark_words_check'
+  - Describe the design.: mark_design
+    input type: area
+    maxlength: 304
+    js show if: |
+      val('mark_makeup') == 'mark_design_check'
+  - Write the words of your mark and describe the design.: mark_words_design
+    input type: area
+    maxlength: 304
+    js show if: |
+      val('mark_makeup') == 'mark_words_design_check'
+---
+id: Describe the goods and services associated with the mark
+question: |
+  Briefly describe how the mark will be used and displayed. Think about the purpose of the mark and what it will be associated with.
+fields:
+  - "Description of goods associated with mark": goods_description
+    input type: area
+    maxlength: 300
+---
+id: Classification Schedule
+question: |
+  Classification Schedule
+subquestion: |
+  There are 45 categories of goods or services associated with marks in Massachusetts. Each one covers a different product area and it is important to specify which one your mark falls under in order to receive protection benefits. Similar marks are allowed to exist when they apply to different classes because there is little to no risk of confusion about the source or identity of the mark.
+  
+  This list gives the ${ collapse_template(class_goods) }
+  
+  This list gives the ${ collapse_template(class_services) }
+  
+  [Click here](https://www.sec.state.ma.us/cor/corpweb/cortmsm/tmsminf.htm) to learn more about each classification and read examples.
+fields:
+  - "Provide each number and class for your goods or services.": mark_class
+    input type: area
+    maxlength: 228
+continue button field: Classification_Schedule
+---
+id: Mark Display
+question: |
+  Mark Display
+subquestion: |
+  Choose the ways that your mark is displayed
+fields:
+  - "On documents, wrappers, or articles delivered with the goods": OnDocumentsWrappersOrArticlesDeliveredWithTheGoods
+    datatype: yesno
+  - "In advertisements of the services": InAdvertisementsOfTheServices
+    datatype: yesno
+  - "In connection with the services rendered": InConnectionWithTheServicesRendered
+    datatype: yesno
+  - "Other": Other
+    datatype: yesno
+  - "Write the other ways that your mark is displayed.": other_mark_use
+    show if: Other
+    input type: area
+    maxlength: 228
+---
+template: class_goods
+subject: |
+  classes for **goods.**
+content: |
+  * Class 1 Chemicals
+  * Class 2 Paints
+  * Class 3 Cosmetics and Cleaning Preparations
+  * Class 4 Lubricants and Fuels
+  * Class 5 Pharmaceuticals
+  * Class 6 Metal Goods
+  * Class 7 Machinery
+  * Class 8 Hand Tools
+  * Class 9 Electrical and Scientific Apparatus
+  * Class 10 Medical Apparatus
+  * Class 11 Environmental Control Apparatus
+  * Class 12 Vehicles
+  * Class 13 Firearms
+  * Class 14 Jewelry
+  * Class 15 Musical Instruments
+  * Class 16 Paper Goods and Printed Matter
+  * Class 17 Rubber Goods
+  * Class 18 Leather Goods
+  * Class 19 Non-metallic building materials
+  * Class 20 Furniture and Articles not Otherwise Classified
+  * Class 21 Houseware and Glasses
+  * Class 22 Cordage and Fibers
+  * Class 23 Yarns and Threads
+  * Class 24 Fabrics
+  * Class 25 Clothing
+  * Class 26 Fancy Goods
+  * Class 27 Floor Coverings
+  * Class 28 Toys and Sporting Goods
+  * Class 29 Meats and Processed Foods
+  * Class 30 Staple Foods
+  * Class 31 Natural Agricultural Products
+  * Class 32 Light Beverages
+  * Class 33 Wines and Spirits
+  * Class 34 Smokers’ Articles
+---
+template: class_services
+subject: |
+  classes for **services.**
+content: |
+  * Class 35 Advertising and Business Management
+  * Class 36 Insurance and Financial
+  * Class 37 Building Construction and Repair
+  * Class 38 Telecommunications
+  * Class 39 Transportation and Storage
+  * Class 40 Treatment of Materials
+  * Class 41 Education and Entertainment
+  * Class 42 Computer, Scientific and Legal
+  * Class 43 Hotels and Restaurants
+  * Class 44 Medical, Beauty and Agriculture
+  * Class 45 Personal
+---
+id: Date of Origin
+question: |
+  Date of Origin
+subquestion: |
+  Write the date that your mark was first used and the date that your mark was first used in Massachusetts. Note: These may be the same
+fields:
+  - "Date mark was first used": mark_date
+    datatype: date
+  - "Date mark was first used in Massachusetts": mark_date_ma
+    datatype: date
+---
+id: USPTO
+question: |
+  USPTO
+subquestion: |
+  Have you previously filed an application with the United States Patent and Trademark Office (USPTO)? Click 'Next" if you have not.
+fields:
+  - "Yes, I have previously filed an application with the USPTO": uspto
+    datatype: yesno
+  - "Date of USPTO filing": uspto_date
+    show if: uspto
+    datatype: date
+  - "USPTO serial number": uspto_serial
+    show if: uspto
+    maxlength: 30
+  - What is the status of your application?: app_status
+    show if: uspto
+    datatype: radio
+    choices:
+      - "Awaiting Examination": AwaitingExamination
+      - "Refusal office action issued": RefusalOfficeActionIssued
+      - "Approved for publication": ApprovedForPublication
+      - "Registered": Registered
+      - "Abandoned or withdrawn": AbandonedWithdrawn
+  - Give the reason that your USPTO application was refused: uspto_refusal_reason
+    input type: area
+    maxlength: 100
+    js show if: |
+      val('app_status') == 'RefusalOfficeActionIssued'
+---
+id: Execution
+question: |
+  Execution
+subquestion: |
+  Write today's date.
+fields:
+  - "month this is being answered": execution_month
+    maxlength: 23
+  - "Day this is being answered": execution_day
+    maxlength: 15
+  - "Year this is being answered": execution_year
+    maxlength: 18
+---
+id: Verification
+question: |
+  Verification
+subquestion: |
+  Write today's date and fill out your address information.
+fields:
+  - "Current month and day": user2_month_day
+    maxlength: 33
+  - "Last two digits of the current year": user2_year_end
+    maxlength: 9
+  - "User2 address": user2_address
+    maxlength: 55
+  - "User2 city": user2_city
+    maxlength: 30
+  - "User2 state": user2_state
+    maxlength: 10
+  - "User2 zip": user2_zip
+    maxlength: 15
+---
+id: preview ma_trademark_application_final
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_recipient_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_ma_trademark_application_final'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: ma_trademark_application_final_preview_question    
+---
+code: |
+  signature_fields = ['signature']
+---
+id: ma trademark application final review screen
+event: review_ma_trademark_application_final
+question: |
+  Review your answers
+review:
+  - Edit: user_last
+    button: |
+      **Your last name**:
+      ${ user_last }
+  - Edit: user_first
+    button: |
+      **Your first name**:
+      ${ user_first }
+  - Edit: user_middle
+    button: |
+      **Your middle name**:
+      ${ user_middle }
+  - Edit: user_address_num
+    button: |
+      **Your address number**:
+      ${ user_address_num }
+  - Edit: user_address_st
+    button: |
+      **Name of your street**:
+      ${ user_address_st }
+  - Edit: bus_name
+    button: |
+      **Name of your Business**:
+      ${ bus_name }
+  - Edit: bus_address_number
+    button: |
+      **Business Address Number**:
+      ${ bus_address_number }
+  - Edit: bus_address_st
+    button: |
+      **Business Address Street**:
+      ${ bus_address_st }
+  - Edit: bus_address_city
+    button: |
+      **Business Address City**:
+      ${ bus_address_city }
+  - Edit: bus_address_zip
+    button: |
+      **Business Address Zip code**:
+      ${ bus_address_zip }
+  - Edit: bus_address_state
+    button: |
+      **Business Address State**:
+      ${ bus_address_state }
+  - Edit: Corporation
+    button: |
+      **Corporation**:
+      ${ word(yesno(Corporation)) }
+  - Edit: LLC
+    button: |
+      **Limited Liability Company**:
+      ${ word(yesno(LLC)) }
+  - Edit: LP
+    button: |
+      **Limited Partnership**:
+      ${ word(yesno(LP)) }
+  - Edit: Partnership
+    button: |
+      **Partnership**:
+      ${ word(yesno(Partnership)) }
+  - Edit: SoleProprietor
+    button: |
+      **Sole proprietor**:
+      ${ word(yesno(SoleProprietor)) }
+  - Edit: corp_other
+    button: |
+      **Corporation Type Not listed**:
+      ${ word(yesno(corp_other)) }
+  - Edit: corp_other_type
+    button: |
+      **Describe corporation type**:
+      ${ corp_other_type }
+  - Edit: corp_state
+    button: |
+      **State of Incorporation**:
+      ${ corp_state }
+  - Edit: corp_date
+    button: |
+      **Date of Incorporation**:
+      ${ corp_date }
+  - Edit: corp_partners
+    button: |
+      **Names of partners in corporation**:
+      > ${ single_paragraph(corp_partners) }
+  - Edit: Trademark
+    button: |
+      **Trademark**:
+      ${ word(yesno(Trademark)) }
+  - Edit: ServiceMark
+    button: |
+      **Service Mark**:
+      ${ word(yesno(ServiceMark)) }
+  - Edit: mark_words
+    button: |
+      **Description if mark is words only**:
+      > ${ single_paragraph(mark_words) }
+  - Edit: mark_design
+    button: |
+      **Description if mark is design only**:
+      > ${ single_paragraph(mark_design) }
+  - Edit: mark_words_design
+    button: |
+      **Description if mark is both words and design**:
+      > ${ single_paragraph(mark_words_design) }
+  - Edit: goods_description
+    button: |
+      **Description of goods associated with mark**:
+      > ${ single_paragraph(goods_description) }
+  - Edit: mark_class
+    button: |
+      **Mark classification**:
+      > ${ single_paragraph(mark_class) }
+  - Edit: OnDocumentsWrappersOrArticlesDeliveredWithTheGoods
+    button: |
+      **On documents, wrappers, or articles delivered with the goods**:
+      ${ word(yesno(OnDocumentsWrappersOrArticlesDeliveredWithTheGoods)) }
+  - Edit: InAdvertisementsOfTheServices
+    button: |
+      **In advertisements of the services**:
+      ${ word(yesno(InAdvertisementsOfTheServices)) }
+  - Edit: InConnectionWithTheServicesRendered
+    button: |
+      **In connection with the services rendered**:
+      ${ word(yesno(InConnectionWithTheServicesRendered)) }
+  - Edit: Other
+    button: |
+      **Other mark display**:
+      ${ word(yesno(Other)) }
+  - Edit: other_mark_use
+    button: |
+      **Other mark display description**:
+      > ${ single_paragraph(other_mark_use) }
+  - Edit: mark_date
+    button: |
+      **Date mark was first used**:
+      ${ mark_date }
+  - Edit: mark_date_ma
+    button: |
+      **Date mark was first used in Massachusetts**:
+      ${ mark_date_ma }
+  - Edit: uspto
+    button: |
+      **Previously filed with uspto**:
+      ${ word(yesno(uspto)) }
+  - Edit: uspto_date
+    button: |
+      **Date of uspto filing**:
+      ${ uspto_date }
+  - Edit: uspto_serial
+    button: |
+      **Uspto serial number**:
+      ${ uspto_serial }
+  - Edit: AwaitingExamination
+    button: |
+      **Awaiting Examination**:
+      ${ word(yesno(AwaitingExamination)) }
+  - Edit: RefusalOfficeActionIssued
+    button: |
+      **Refusal office action issued**:
+      ${ word(yesno(RefusalOfficeActionIssued)) }
+  - Edit: ApprovedForPublication
+    button: |
+      **Approved for publication**:
+      ${ word(yesno(ApprovedForPublication)) }
+  - Edit: Registered
+    button: |
+      **Registered**:
+      ${ word(yesno(Registered)) }
+  - Edit: AbandonedWithdrawn
+    button: |
+      **Abandoned or withdrawn**:
+      ${ word(yesno(AbandonedWithdrawn)) }
+  - Edit: uspto_refusal_reason
+    button: |
+      **Uspto refusal reason**:
+      ${ uspto_refusal_reason }
+  - Edit: execution_month
+    button: |
+      **month this is being answered**:
+      ${ execution_month }
+  - Edit: execution_day
+    button: |
+      **Day this is being answered**:
+      ${ execution_day }
+  - Edit: execution_year
+    button: |
+      **Year this is being answered**:
+      ${ execution_year }
+  - Edit: user2_month_day
+    button: |
+      **Current month and day**:
+      ${ user2_month_day }
+  - Edit: user2_year_end
+    button: |
+      **Last two digits of the current year**:
+      ${ user2_year_end }
+  - Edit: user2_address
+    button: |
+      **User2 address**:
+      ${ user2_address }
+  - Edit: user2_city
+    button: |
+      **User2 city**:
+      ${ user2_city }
+  - Edit: user2_state
+    button: |
+      **User2 state**:
+      ${ user2_state }
+  - Edit: user2_zip
+    button: |
+      **User2 zip**:
+      ${ user2_zip }
+  - Edit: user_type
+    button: |
+      **Type of applicant**:
+      ${ user_type }
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: applicant.revisit
+    button: |
+      **Applicant**
+
+      % for item in applicant:
+        * ${ item }
+      % endfor
+  - Edit: signature
+    button: |
+      **signature**:
+      ${ signature }
+---
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Address: |
+      row_item.address.block() if defined("row_item.address.zip") else ""
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Phone number: |
+      row_item.phone_number if defined("row_item.phone_number") else ""
+  - Email: |
+      row_item.email if defined("row_item.email") else ""
+edit:
+  - address.zip
+  - name.first
+  - phone_number
+  - email
+confirm: True
+
+---
+continue button field: applicant.revisit
+question: |
+  Edit applicant
+subquestion: |
+  ${ applicant.table }
+
+  ${ applicant.add_action() }
+---
+table: applicant.table
+rows: applicant
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+id: download ma_trademark_application_final
+event: ma_trademark_application_final_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_ma_trademark_application_final'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+objects:
+  - ma_trademark_application_final_post_interview_instructions: ALDocument.using(title="Instructions", filename="ma_trademark_application_final_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  - ma_trademark_application_final_attachment: ALDocument.using(title="Massachusetts Trademark/Service Mark Application", filename="ma_trademark_application_final.pdf", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+---
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[ma_trademark_application_final_post_interview_instructions,ma_trademark_application_final_attachment], filename="ma_trademark_application_final.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+  - al_recipient_bundle: ALDocumentBundle.using(elements=[ma_trademark_application_final_attachment], filename="ma_trademark_application_final.pdf_package.pdf", title="All forms to download for your records", enabled=True)
+---
+attachments:
+  - name: ma trademark application final post interview instructions
+    filename: Post-interview-instructions     
+    variable name: ma_trademark_application_final_post_interview_instructions[i]        
+    skip undefined: True
+    docx template file: ma_trademark_application_final_next_steps.docx
+  - name: ma trademark application final attachment
+    filename: ma_trademark_application_final.pdf     
+    variable name: ma_trademark_application_final_attachment[i]        
+    skip undefined: True
+    pdf template file: ma_trademark_application_final.pdf
+    fields:
+      - "user_address_city": |
+          % if user_type == "Individual":
+          ${ users[0].address.city }
+          % endif
+      - "user_address_state": |
+          % if user_type == "Individual":
+          ${ users[0].address.state }
+          % endif
+      - "user_address_zip": |
+          % if user_type == "Individual":
+          ${ users[0].address.zip }
+          % endif
+      - "user2_name_full": ${ users[0] }
+      - "user2_phone": ${ users[0].phone_numbers() }
+      - "user2_email": ${ users[0].email }
+      - "applicant_name": ${ users[0] }
+      - "user_last": |
+          % if user_type == "Individual":
+          ${ users[0].name.last }
+          % endif
+      - "user_first": |
+          % if user_type == "Individual":
+          ${ users[0].name.first }
+          % endif
+      - "user_middle": |
+          % if user_type == "Individual":
+          ${ users[0].name.middle }
+          % endif
+      - "user_address_st": |
+          % if user_type == "Individual":
+          ${ users[0].address.line_one() }
+          % endif
+      - "bus_name": ${ bus_name }
+      - "bus_address_st": |
+          % if user_type == "Business/Organization":
+          ${ business_address.line_one() }
+          % endif
+      - "bus_address_city": |
+          % if user_type == "Business/Organization":
+          ${ business_address.city }
+          % endif
+      - "bus_address_zip": |
+          % if user_type == "Business/Organization":
+          ${ business_address.zip }
+          % endif
+      - "bus_address_state": |
+          % if user_type == "Business/Organization":
+          ${ business_address.state }
+          % endif
+      - "Corporation": ${ bus_type == "Corporation" }
+      - "LLC": ${ bus_type =="LLC" }
+      - "LP": ${ bus_type == "LP" }
+      - "Partnership": ${ bus_type == "Partnership" }
+      - "SoleProprietor": ${ bus_type == "SoleProprietor" }
+      - "corp_other": ${ bus_type == "corp_other" }
+      - "corp_other_type": ${ corp_other_type }
+      - "corp_state": ${ corp_state }
+      - "corp_date": ${ corp_date }
+      - "corp_partners": ${ corp_partners }
+      - "Trademark": ${ Trade_mark == "Trademark" }
+      - "ServiceMark": ${ Trade_mark == "ServiceMark" }
+      - "mark_words": ${ mark_words }
+      - "mark_design": ${ mark_design }
+      - "mark_words_design": ${ mark_words_design }
+      - "goods_description": ${ goods_description }
+      - "mark_class": ${ mark_class }
+      - "OnDocumentsWrappersOrArticlesDeliveredWithTheGoods": ${ OnDocumentsWrappersOrArticlesDeliveredWithTheGoods }
+      - "InAdvertisementsOfTheServices": ${ InAdvertisementsOfTheServices }
+      - "InConnectionWithTheServicesRendered": ${ InConnectionWithTheServicesRendered }
+      - "Other": ${ Other }
+      - "other_mark_use": ${ other_mark_use }
+      - "mark_date": ${ mark_date }
+      - "mark_date_ma": ${ mark_date_ma }
+      - "uspto_yes": ${ uspto }
+      - "uspto_no": ${ not uspto }
+      - "uspto_date": ${ uspto_date }
+      - "uspto_serial": ${ uspto_serial }
+      - "AwaitingExamination": ${ app_status == "AwaitingExamination" }
+      - "RefusalOfficeActionIssued": ${ app_status == "RefusalOfficeActionIssued" }
+      - "ApprovedForPublication": ${ app_status == "ApprovedForPublication" }
+      - "Registered": ${ app_status == "Registered" }
+      - "AbandonedWithdrawn": ${ app_status == "AbandonedWithdrawn" }
+      - "uspto_refusal_reason": ${ uspto_refusal_reason }
+      - "execution_month": ${ month_of(today_date) }
+      - "execution_day": ${ day_of(today_date) }
+      - "execution_year": ${ year_of(today_date) }
+      - "user2_month_day": ${ month_of(today_date, as_word=True) }
+      - "user2_year_end": ${ year_of(today_date) }
+      - "user2_address": ${ users[0].address.line_one() }
+      - "user2_city": ${ users[0].address.city }
+      - "user2_state": ${ users[0].address.state }
+      - "user2_zip": ${ users[0].address.zip }
+      - "user_type": ${ user_type }
+      # It's a signature: test which file version this is; leave empty unless it's the final version)
+      - "signature": ${ users[0].signature_if_final(i) }
